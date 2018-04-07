@@ -22,30 +22,26 @@ LABEL site="https://nifi.apache.org"
 
 ARG UID=1000
 ARG GID=1000
-ARG NIFI_VERSION=1.6.0
+ARG NIFI_KIT_VERSION=1.6.0
 ARG MIRROR=https://archive.apache.org/dist
 
-ENV NIFI_BASE_DIR /opt/nifi 
-# ENV NIFI_HOME=${NIFI_BASE_DIR}/nifi-${NIFI_VERSION} \
-ENV NIFI_HOME=${NIFI_BASE_DIR}
-ENV NIFI_BINARY_URL=/nifi/${NIFI_VERSION}/nifi-${NIFI_VERSION}-bin.tar.gz
-
-ADD sh/ /opt/nifi/scripts/
-
+ENV NIFI_KIT_BASE_DIR /opt/nifi/kit
+ENV NIFI_KIT_HOME=${NIFI_BASE_DIR}
+ENV NIFI_KIT_BINARY_URL=/nifi/${NIFI_KIT_VERSION}/nifi-toolkit-${NIFI_KIT_VERSION}-bin.tar.gz
 # Setup NiFi user
-RUN mkdir -p ${NIFI_HOME}/conf/templates \
+RUN mkdir -p ${NIFI_KIT_HOME} \
     && apt-get update \
     && apt-get install -y jq xmlstarlet \
-    && curl -fSL ${MIRROR}/${NIFI_BINARY_URL} -o ${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz \
-    && echo "$(curl https://archive.apache.org/dist/${NIFI_BINARY_URL}.sha256) *${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz" | sha256sum -c - \
-    && tar -xvzf ${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz -C ${NIFI_BASE_DIR} --strip-components=1 \
-    && rm ${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz
+    && curl -fSL ${MIRROR}/${NIFI_KIT_BINARY_URL} -o ${NIFI_KIT_BASE_DIR}/nifi-toolkit-${NIFI_KIT_VERSION}-bin.tar.gz \
+    && echo "$(curl https://archive.apache.org/dist/${NIFI_BINARY_URL}.sha256) *${NIFI_KIT_BASE_DIR}/nifi-toolkit-${NIFI_KIT_VERSION}-bin.tar.gz" | sha256sum -c - \
+    && tar -xvzf ${NIFI_KIT_BASE_DIR}/nifi-toolkit-${NIFI_KIT_VERSION}-bin.tar.gz -C ${NIFI_KIT_BASE_DIR} --strip-components=1 \
+    && rm ${NIFI_KIT_BASE_DIR}/nifi-${NIFI_KIT_VERSION}-bin.tar.gz
 
 # Web HTTP(s) & Socket Site-to-Site Ports
 EXPOSE 8080 8443 10000
 
-WORKDIR ${NIFI_HOME}
-VOLUME ["${NIFI_HOME}/conf/templates","${NIFI_HOME}/database_repository","${NIFI_HOME}/flowfile_repository","${NIFI_HOME}/content_repository","${NIFI_HOME}/provenance_repository","${NIFI_HOME}/logs"]
+WORKDIR ${NIFI_KIT_HOME}
+VOLUME ["${NIFI_KIT_HOME}"]
 
 # Apply configuration and start NiFi
-CMD ${NIFI_BASE_DIR}/scripts/start.sh
+CMD bash

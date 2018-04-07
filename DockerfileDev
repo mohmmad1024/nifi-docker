@@ -16,31 +16,23 @@
 # under the License.
 #
 
-FROM openjdk:8-jre
+FROM maven:3.5.3-jdk-8
 LABEL maintainer="Mohammed Alsahli <mohmmad1024@gmail.com>"
-LABEL site="https://nifi.apache.org"
+LABEL site="https://github.com/apache/nifi"
 
-ARG UID=1000
-ARG GID=1000
-ARG NIFI_VERSION=1.6.0
-ARG MIRROR=https://archive.apache.org/dist
-
-ENV NIFI_BASE_DIR /opt/nifi 
-# ENV NIFI_HOME=${NIFI_BASE_DIR}/nifi-${NIFI_VERSION} \
+ENV NIFI_BASE_DIR /opt/nifi
 ENV NIFI_HOME=${NIFI_BASE_DIR}
-ENV NIFI_BINARY_URL=/nifi/${NIFI_VERSION}/nifi-${NIFI_VERSION}-bin.tar.gz
+
 
 ADD sh/ /opt/nifi/scripts/
 
 # Setup NiFi user
 RUN mkdir -p ${NIFI_HOME}/conf/templates \
     && apt-get update \
-    && apt-get install -y jq xmlstarlet \
-    && curl -fSL ${MIRROR}/${NIFI_BINARY_URL} -o ${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz \
-    && echo "$(curl https://archive.apache.org/dist/${NIFI_BINARY_URL}.sha256) *${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz" | sha256sum -c - \
-    && tar -xvzf ${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz -C ${NIFI_BASE_DIR} --strip-components=1 \
-    && rm ${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}-bin.tar.gz
+    && apt-get install -y jq xmlstarlet
 
+RUN git clone https://github.com/apache/nifi.git /opt/nifi
+RUN cd /opt/nifi && mvn -T 2.0C clean install
 # Web HTTP(s) & Socket Site-to-Site Ports
 EXPOSE 8080 8443 10000
 
