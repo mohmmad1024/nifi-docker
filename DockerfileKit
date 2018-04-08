@@ -29,7 +29,7 @@ ENV NIFI_KIT_BASE_DIR /opt/nifi/kit
 ENV NIFI_KIT_HOME=${NIFI_BASE_DIR}
 ENV NIFI_KIT_BINARY_URL=/nifi/${NIFI_KIT_VERSION}/nifi-toolkit-${NIFI_KIT_VERSION}-bin.tar.gz
 # Setup NiFi user
-RUN mkdir -p ${NIFI_KIT_HOME} \
+RUN mkdir -p ${NIFI_KIT_HOME}/ \
     && apt-get update \
     && apt-get install -y jq xmlstarlet \
     && curl -fSL ${MIRROR}/${NIFI_KIT_BINARY_URL} -o ${NIFI_KIT_BASE_DIR}/nifi-toolkit-${NIFI_KIT_VERSION}-bin.tar.gz \

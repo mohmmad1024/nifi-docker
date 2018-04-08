@@ -24,16 +24,14 @@ ENV NIFI_BASE_DIR /opt/nifi
 ENV NIFI_HOME=${NIFI_BASE_DIR}
 
 
-ADD sh/ /opt/nifi/scripts/
-
 # Setup NiFi user
-RUN mkdir -p ${NIFI_HOME}/conf/templates \
-    && apt-get update \
+RUN apt-get update \
     && apt-get install -y jq xmlstarlet
 
 RUN git clone https://github.com/apache/nifi.git /opt/nifi
 RUN cd /opt/nifi && mvn -T 2.0C clean install
 # Web HTTP(s) & Socket Site-to-Site Ports
+ADD sh/ /opt/nifi/scripts/
 EXPOSE 8080 8443 10000
 
 WORKDIR ${NIFI_HOME}
